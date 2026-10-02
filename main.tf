@@ -1,12 +1,11 @@
 data "aws_ami" "app_ami" {
   most_recent = true
 
-  # AWS Marketplace account ID (where official Bitnami AMIs are hosted)
-  owners = ["679593333241"]
+  owners = ["amazon"]
 
   filter {
     name   = "name"
-    values = ["bitnami-tomcat-*"]
+    values = ["al2023-ami-2023.*-kernel-*-x86_64"]
   }
 
   filter {
@@ -23,6 +22,13 @@ data "aws_ami" "app_ami" {
 resource "aws_instance" "web" {
   ami           = data.aws_ami.app_ami.id
   instance_type = "t3.nano"
+
+  user_data = <<-EOF
+    #!/bin/bash
+    dnf install -y docker
+    systemctl enable --now docker
+    docker run -d --restart unless-stopped -p 8080:8080 public.ecr.aws/docker/library/tomcat:latest
+  EOF
 
   tags = {
     Name = "HelloWorld"
