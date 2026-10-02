@@ -1,9 +1,12 @@
 data "aws_ami" "app_ami" {
   most_recent = true
 
+  # AWS Marketplace account ID (where official Bitnami AMIs are hosted)
+  owners = ["679593333241"]
+
   filter {
     name   = "name"
-    values = ["bitnami-tomcat-*-x86_64-hvm-ebs-nami"]
+    values = ["bitnami-tomcat-*"]
   }
 
   filter {
@@ -11,7 +14,10 @@ data "aws_ami" "app_ami" {
     values = ["hvm"]
   }
 
-  owners = ["979382823631"] # Bitnami
+  filter {
+    name   = "architecture"
+    values = ["x86_64"]
+  }
 }
 
 resource "aws_instance" "web" {
